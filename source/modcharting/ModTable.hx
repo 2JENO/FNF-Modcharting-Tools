@@ -158,7 +158,7 @@ class ModTable
 
 
     
-    public function tweenModifier(modifier:String, val:Float, time:Float, ease:String, beat:Float)
+    public function tweenModifier(modifier:String, val:Float, time:Float, ease:String, beat:Float, ?tag:String = null)
     {
         var modifiers:Map<String, Modifier> = renderer.modifierTable.modifiers;
         if (modifiers.exists(modifier))
@@ -172,7 +172,14 @@ class ModTable
             time /= renderer.speed;
             var tween = renderer.createTween(modifiers.get(modifier), {currentValue: val}, time, {ease: easefunc,
                 onComplete: function(twn:FlxTween) {
-    
+                    var modifierTag:String = (tag != null ? tag : modifier);
+                    #if PSYCH
+                        #if (PSYCHVERSION >= "0.7")
+                        PlayState.instance.callOnScripts("onModifierComplete", [modifierTag]);
+                        #else
+                        PlayState.instance.callOnLuas("onModifierComplete", [modifierTag]);
+                        #end
+                    #end
                 }
             });
             if (Conductor.songPosition > ModchartUtil.getTimeFromBeat(beat)) //skip to where it should be i guess??
@@ -187,7 +194,7 @@ class ModTable
         }
     }
 
-    public function tweenModifierSubValue(modifier:String, subValue:String, val:Float, time:Float, ease:String, beat:Float)
+    public function tweenModifierSubValue(modifier:String, subValue:String, val:Float, time:Float, ease:String, beat:Float, ?tag:String = null)
     {
         var modifiers:Map<String, Modifier> = renderer.modifierTable.modifiers;
         if (modifiers.exists(modifier))
@@ -209,6 +216,14 @@ class ModTable
                     onComplete: function(twn:FlxTween) {
                         if (modifiers.exists(modifier))
                             modifiers.get(modifier).subValues.get(subValue).value = val;
+                        var modifierTag:String = (tag != null ? tag : '$modifier-$subValue');
+                        #if PSYCH
+                            #if (PSYCHVERSION >= "0.7")
+                            PlayState.instance.callOnScripts("onModifierComplete", [modifier, subValue]);
+                            #else
+                            PlayState.instance.callOnLuas("onModifierComplete", [modifier, subValue]);
+                            #end
+                        #end
                     },
                     onUpdate: function(twn:FlxTween) {
                         //need to update like this because its inside a map
