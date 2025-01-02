@@ -20,7 +20,6 @@ import openfl.geom.Rectangle;
 import openfl.display.BitmapData;
 import flixel.util.FlxColor;
 import flixel.math.FlxMath;
-import flixel.FlxSprite;
 import flixel.util.FlxSort;
 #if (flixel < "5.3.0")
 import flixel.system.FlxSound;
@@ -56,7 +55,6 @@ import states.MusicBeatState;
 import substates.MusicBeatSubstate;
 #elseif (PSYCH && PSYCHVERSION >= "0.7")
 import flixel.addons.ui.FlxUIDropDownMenu;
-import backend.Section.SwagSection;
 import backend.MusicBeatSubstate;
 import objects.Note;
 import objects.StrumNote;
@@ -337,20 +335,12 @@ class ModchartEditorState extends #if (PSYCH && PSYCHVERSION >= "0.7") backend.M
 
     public var opponentMode:Bool = false;
 
-    #if (PSYCH && PSYCHVERSION >= "0.7.1")
-    var backupGpu:Bool;
-    #end
-
     override public function new()
     {
         super();
     }
     override public function create()
     {	
-	#if (PSYCH && PSYCHVERSION >= "0.7.1")
-	backupGpu = ClientPrefs.data.cacheOnGPU;
-	ClientPrefs.data.cacheOnGPU = false;
-	#end
 	#if PSYCH
 	Paths.clearStoredMemory();
 	Paths.clearUnusedMemory();
@@ -559,12 +549,6 @@ class ModchartEditorState extends #if (PSYCH && PSYCHVERSION >= "0.7") backend.M
 
         
     }
-    #if (PSYCH && PSYCHVERSION >= "0.7.1")
-    override public function destroy() {
-        ClientPrefs.data.cacheOnGPU = backupGpu;
-        super.destroy();
-    }
-    #end
     var dirtyUpdateNotes:Bool = false;
     var dirtyUpdateEvents:Bool = false;
     var dirtyUpdateModifiers:Bool = false;
@@ -1202,13 +1186,13 @@ class ModchartEditorState extends #if (PSYCH && PSYCHVERSION >= "0.7") backend.M
 
 
                 #if PSYCH
-                    var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote, false);
+                    var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote, false, false, null, true);
                     swagNote.sustainLength = songNotes[2];
                     swagNote.mustPress = gottaHitNote;
                     swagNote.gfNote = (section.gfSection && (songNotes[1]<4));
                     swagNote.noteType = songNotes[3];
                     #if (PSYCHVERSION >= "0.7")
-                    if(!Std.isOfType(songNotes[3], String)) swagNote.noteType = states.editors.ChartingState.noteTypeList[songNotes[3]]; //Backward compatibility + compatibility with Week 7 charts
+                    if(!Std.isOfType(songNotes[3], String)) swagNote.noteType = Note.defaultNoteTypes[songNotes[3]]; //Backward compatibility + compatibility with Week 7 charts
                     #else
                     if(!Std.isOfType(songNotes[3], String)) swagNote.noteType = editors.ChartingState.noteTypeList[songNotes[3]]; //Backward compatibility + compatibility with Week 7 charts
                     #end
@@ -1229,7 +1213,7 @@ class ModchartEditorState extends #if (PSYCH && PSYCHVERSION >= "0.7") backend.M
 						oldNote = unspawnNotes[Std.int(unspawnNotes.length - 1)];
 
                         #if PSYCH
-						var sustainNote:Note = new Note(daStrumTime + (Conductor.stepCrochet * susNote), daNoteData, oldNote, true);
+						var sustainNote:Note = new Note(daStrumTime + (Conductor.stepCrochet * susNote), daNoteData, oldNote, true, false, null);
                         sustainNote.mustPress = gottaHitNote;
                         #else 
                         var sustainNote:Note = new Note(daStrumTime + (Std.int(Conductor.stepCrochet) * susNote) + Std.int(Conductor.stepCrochet), daNoteData, oldNote, true, 0, songNotes[4], null, [0], gottaHitNote);
@@ -1422,7 +1406,7 @@ class ModchartEditorState extends #if (PSYCH && PSYCHVERSION >= "0.7") backend.M
 
             strumLineNotes.add(babyArrow);
             #if PSYCH 
-            babyArrow.postAddedToGroup();
+            babyArrow.playerPosition();
             #end
         }
     }

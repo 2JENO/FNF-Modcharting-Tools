@@ -3,6 +3,7 @@ package modcharting;
 import flixel.tweens.FlxEase;
 import flixel.math.FlxMath;
 import flixel.math.FlxAngle;
+import lime.math.Vector2;
 import openfl.geom.Vector3D;
 import flixel.FlxG;
 
@@ -28,9 +29,9 @@ class ModchartUtil
         //not expecting all to work
         #if PSYCH
             #if (PSYCHVERSION >= "0.7")
-            return ClientPrefs.downScroll;
-            #else
             return ClientPrefs.data.downScroll;
+            #else
+            return ClientPrefs.downScroll;
             #end
         #elseif LEATHER
         return utilities.Options.getData("downscroll");
@@ -51,11 +52,11 @@ class ModchartUtil
     public static function getMiddlescroll(instance:ModchartMusicBeatState)
     {
         #if PSYCH
-            #if (PSYCHVERSION >= "0.7")
-            return ClientPrefs.middleScroll;
-            #else
-            return ClientPrefs.data.middleScroll;
-            #end
+        #if (PSYCHVERSION >= "0.7")
+        return ClientPrefs.data.middleScroll;
+        #else
+        return ClientPrefs.middleScroll;
+        #end
         #elseif LEATHER
         return utilities.Options.getData("middlescroll");
         #else 
@@ -263,6 +264,26 @@ class ModchartUtil
 		return FlxEase.linear;
 	}
 
+    public static function rotateAround(origin:Vector2, point:Vector2, degrees:Float):Vector2
+    {
+        // public function rotateAround(origin, point, degrees):FlxBasePoint{
+        // public function rotateAround(origin, point, degrees){
+        var angle:Float = degrees * (Math.PI / 180);
+        var ox = origin.x;
+        var oy = origin.y;
+        var px = point.x;
+        var py = point.y;
+
+        var qx = ox + FlxMath.fastCos(angle) * (px - ox) - FlxMath.fastSin(angle) * (py - oy);
+        var qy = oy + FlxMath.fastSin(angle) * (px - ox) + FlxMath.fastCos(angle) * (py - oy);
+
+        // point.x = qx;
+        // point.y = qy;
+
+        return (new Vector2(qx, qy));
+        // return FlxBasePoint.weak(qx, qy);
+        // return qx, qy;
+    }
 
     public static function getTimeFromBeat(beat:Float)
     {

@@ -44,6 +44,26 @@ class SustainStrip extends FlxStrip
             indices.push(ind);
     }
 
+    // TODO: check this for cases when zoom is less than initial zoom...
+	public function drawData(cameraStuff:Array<FlxCamera>):Void
+    {
+        if (alpha == 0 || graphic == null || vertices == null)
+            return;
+
+        for (camera in cameraStuff)
+        {
+            if (!camera.visible || !camera.exists)
+                continue;
+
+            getScreenPosition(_point, camera).subtractPoint(offset);
+            #if !flash
+            camera.drawTriangles(graphic, vertices, indices, uvtData, colors, _point, blend, repeat, antialiasing, colorTransform, shader);
+            #else
+            camera.drawTriangles(graphic, vertices, indices, uvtData, colors, _point, blend, repeat, antialiasing);
+            #end
+        }
+    }
+
     public function constructVertices(noteData:NotePositionData, thisNotePos:Vector3D, nextHalfNotePos:NotePositionData, nextNotePos:NotePositionData, flipGraphic:Bool, reverseClip:Bool)
     {
         var yOffset = -1; //fix small gaps

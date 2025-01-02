@@ -942,17 +942,25 @@ class InvertSineModifier extends Modifier
 
 class BoostModifier extends Modifier
 {
+    override function setupSubValues()
+    {
+        subValues.set('offset', new ModifierSubValue(1.0));
+    }
     override function curPosMath(lane:Int, curPos:Float, pf:Int)
     {
         var yOffset:Float = 0;
 
-        var speed = renderer.getCorrectScrollSpeed();
-
+        var speed;
+        if(subValues.get('offset').value != 1.0)
+            speed = renderer.getCorrectScrollSpeed() * subValues.get('offset').value;
+        else
+            speed = renderer.getCorrectScrollSpeed();
+        
         var fYOffset = -curPos / speed;
 		var fEffectHeight = FlxG.height;
 		var fNewYOffset = fYOffset * 1.5 / ((fYOffset+fEffectHeight/1.2)/fEffectHeight);
-		var fBrakeYAdjust = currentValue * (fNewYOffset - fYOffset);
-		fBrakeYAdjust = FlxMath.bound( fBrakeYAdjust, -400, 400 ); //clamp
+		var fBrakeYAdjust = (currentValue) * (fNewYOffset - fYOffset);
+		fBrakeYAdjust = FlxMath.bound(fBrakeYAdjust, -400, 400 ); //clamp
         
 		yOffset -= fBrakeYAdjust*speed;
 

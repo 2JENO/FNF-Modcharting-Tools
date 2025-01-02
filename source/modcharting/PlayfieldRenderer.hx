@@ -14,7 +14,6 @@ import openfl.geom.Vector3D;
 import flixel.util.FlxSpriteUtil;
 import flixel.graphics.frames.FlxFrame;
 import flixel.group.FlxGroup.FlxTypedGroup;
-import flixel.FlxSprite;
 
 import flixel.FlxG;
 import modcharting.Modifier;
@@ -54,7 +53,7 @@ typedef StrumNoteType =
 #elseif ANDROMEDA Receptor
 #else FlxSprite #end;
 
-class PlayfieldRenderer extends FlxSprite //extending flxsprite just so i can edit draw
+class PlayfieldRenderer extends FunkinSprite //extending flxsprite just so i can edit draw
 {
     public var strumGroup:FlxTypedGroup<StrumNoteType>;
     public var notes:FlxTypedGroup<Note>;
@@ -113,11 +112,11 @@ class PlayfieldRenderer extends FlxSprite //extending flxsprite just so i can ed
     override function update(elapsed:Float) 
     {
         try {
-            eventManager.update(elapsed);
-            tweenManager.update(elapsed); //should be automatically paused when you pause in game
-            timerManager.update(elapsed);
+            if(eventManager != null) eventManager.update(elapsed);
+            if(tweenManager != null) tweenManager.update(elapsed); //should be automatically paused when you pause in game
+            if(timerManager != null) timerManager.update(elapsed);
         } catch(e) {
-            trace(e);
+           // trace(e);
         }
         super.update(elapsed);
     }
@@ -128,8 +127,10 @@ class PlayfieldRenderer extends FlxSprite //extending flxsprite just so i can ed
         if (alpha == 0 || !visible)
             return;
 
-        strumGroup.cameras = this.cameras;
-        notes.cameras = this.cameras;
+        if(inEditor){
+            strumGroup.cameras = this.cameras;
+            notes.cameras = this.cameras;
+        }
         
         try {
             drawStuff(getNotePositions());
@@ -175,8 +176,6 @@ class PlayfieldRenderer extends FlxSprite //extending flxsprite just so i can ed
         modifierTable.applyStrumMods(strumData, i, pf);
         return strumData;
     }
-
-   
 
     private function addDataToNote(noteData:NotePositionData, daNote:Note)
     {
@@ -264,12 +263,12 @@ class PlayfieldRenderer extends FlxSprite //extending flxsprite just so i can ed
                 var sustainTimeThingy:Float = 0;
 
                 //just causes too many issues lol, might fix it at some point
-                /*if (notes.members[i].animation.curAnim.name.endsWith('end') && ClientPrefs.downScroll)
+                /*if (notes.members[i].animation.curAnim.name.endsWith('end') && ClientPrefs.data.downScroll)
                 {
                     if (noteDist > 0)
-                        sustainTimeThingy = (NoteMovement.getFakeCrochet()/4)/2; //fix stretched sustain ends (downscroll)
+                        sustainTimeThingy = (ModchartUtil.getFakeCrochet()/4)/2; //fix stretched sustain ends (downscroll)
                     //else 
-                        //sustainTimeThingy = (-NoteMovement.getFakeCrochet()/4)/songSpeed;
+                        //sustainTimeThingy = (-ModchartUtil.getFakeCrochet()/4)/songSpeed;
                 }*/
                     
                 var curPos = getNoteCurPos(i, sustainTimeThingy);
@@ -328,7 +327,7 @@ class PlayfieldRenderer extends FlxSprite //extending flxsprite just so i can ed
         // noteData.skewY = skewY + noteData.skewY;
 
         addDataToStrum(noteData, strumGroup.members[noteData.index]); //set position and stuff before drawing
-        strumGroup.members[noteData.index].cameras = this.cameras;
+        if(inEditor) strumGroup.members[noteData.index].cameras = this.cameras;
 
         strumGroup.members[noteData.index].draw();
     }
@@ -354,7 +353,7 @@ class PlayfieldRenderer extends FlxSprite //extending flxsprite just so i can ed
         //set note position using the position data
         addDataToNote(noteData, notes.members[noteData.index]); 
         //make sure it draws on the correct camera
-        notes.members[noteData.index].cameras = this.cameras;
+        if(inEditor) notes.members[noteData.index].cameras = this.cameras;
         //draw it
         notes.members[noteData.index].draw();
     }
@@ -413,8 +412,55 @@ class PlayfieldRenderer extends FlxSprite //extending flxsprite just so i can ed
         //render that shit
         daNote.mesh.constructVertices(noteData, thisNotePos, nextHalfNotePos, nextNotePos, flipGraphic, reverseClip);
 
-        daNote.mesh.cameras = this.cameras;
-        daNote.mesh.draw();
+        if(inEditor){
+            daNote.mesh.cameras = this.cameras;
+            daNote.mesh.draw();
+        }
+        else if(daNote.reduce){
+            //render that shit
+            var yOffset = -1; //fix small gaps
+            if (reverseClip)
+                yOffset *= -1;
+
+            if (flipGraphic) {
+                daNote.nextNote.x = (nextNotePos.x);
+                daNote.nextNote.y = (nextNotePos.y); //slight offset to fix small gaps
+                daNote.nextNote.y = (nextNotePos.y);
+
+                daNote.prevNote.x = (nextHalfNotePos.x);
+                daNote.prevNote.y = (nextHalfNotePos.y);
+                daNote.prevNote.y = (nextHalfNotePos.y);
+
+                noteData.x = (thisNotePos.x);
+                noteData.y = (thisNotePos.y);
+                noteData.y = (thisNotePos.y);
+            } else {
+                noteData.x = (thisNotePos.x);
+                noteData.y = (thisNotePos.y); //fliped this with the down ones (last) to test if it bugs of it fixes itself
+                noteData.y = (thisNotePos.y);
+
+                daNote.prevNote.x = (nextNotePos.x);
+                daNote.prevNote.y = (nextNotePos.y);
+                daNote.prevNote.y = (nextNotePos.y);
+
+                if(daNote.nextNote != null){
+                    daNote.nextNote.x = (nextHalfNotePos.x);
+                    daNote.nextNote.y = (nextHalfNotePos.y); //slight offset to fix small gaps
+                    daNote.nextNote.y = (nextHalfNotePos.y);
+                }
+            }
+            /*daNote.prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.05;
+            if(PlayState.isPixelStage)
+                daNote.scale.y *= PlayState.daPixelZoom;*/
+            /*noteData.x = thisNotePos.x;
+            noteData.y = thisNotePos.y;*/
+            noteData.scaleX *= (1/-thisNotePos.z);
+            noteData.scaleY *= (1/-thisNotePos.z);
+            addDataToNote(noteData, daNote); 
+            daNote.draw();
+        }
+        else
+            daNote.mesh.drawData(daNote.cameras);
     }
 
     private function drawStuff(notePositions:Array<NotePositionData>)
