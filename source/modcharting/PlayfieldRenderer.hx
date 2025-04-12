@@ -131,6 +131,8 @@ class PlayfieldRenderer extends FunkinSprite //extending flxsprite just so i can
             strumGroup.cameras = this.cameras;
             notes.cameras = this.cameras;
         }
+
+        getScreenPosition(_point, camera).subtractPoint(offset);
         
         try {
             drawStuff(getNotePositions());

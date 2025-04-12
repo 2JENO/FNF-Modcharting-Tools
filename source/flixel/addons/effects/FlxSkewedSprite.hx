@@ -3,7 +3,6 @@ package flixel.addons.effects;
 import openfl.geom.Matrix;
 import flixel.FlxCamera;
 import flixel.FlxG;
-import flixel.FlxSprite;
 import flixel.graphics.frames.FlxFrame.FlxFrameAngle;
 import flixel.math.FlxAngle;
 import flixel.math.FlxPoint;
