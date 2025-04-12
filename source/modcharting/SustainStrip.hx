@@ -1,5 +1,6 @@
 package modcharting;
 
+import flixel.FlxCamera;
 import flixel.graphics.tile.FlxDrawTrianglesItem.DrawData;
 import openfl.geom.Vector3D;
 #if LEATHER

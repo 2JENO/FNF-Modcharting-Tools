@@ -36,6 +36,8 @@ import Note;
 import StrumNote;
 #end
 
+import funkin.graphics.FunkinSprite;
+
 using StringTools;
 
 //a few todos im gonna leave here:

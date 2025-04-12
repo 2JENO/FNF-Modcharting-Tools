@@ -13,7 +13,7 @@ import states.MusicBeatState;
 import substates.MusicBeatSubstate;
 #elseif (PSYCH && PSYCHVERSION >= "0.7")
 import flixel.addons.ui.FlxUIDropDownMenu;
-import backend.Section.SwagSection;
+import backend.Song.SwagSection;
 import states.PlayState;
 import backend.CoolUtil;
 import backend.Conductor;
@@ -50,3 +50,5 @@ import psychlua.HScript as FunkinHScript;
 import sys.FileSystem;
 import sys.io.File;
 #end
+
+import flixel.FlxSprite;

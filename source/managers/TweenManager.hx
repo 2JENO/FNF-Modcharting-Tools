@@ -6,6 +6,8 @@ import flixel.FlxObject;
 import flixel.tweens.FlxTween;
 import flixel.tweens.misc.*;
 
+import flixel.FlxSprite;
+
 class TweenManager extends FlxTweenManager
 {
 	public function bezierPathTween(Object:Dynamic, Values:Dynamic<Array<Float>>, Duration:Float = 1, ?Options:TweenOptions):BezierPathTween{
