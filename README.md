@@ -12,7 +12,7 @@ Still very WIP and not everything is supported yet!
 ![](https://github.com/TheZoroForce240/FNF-Modcharting-Tools/blob/main/readme/custommods.gif)
 ### Support for multiple engines
 - Base Game (not tested)
-- [Psych Engine](https://github.com/ShadowMario/FNF-PsychEngine) (working 0.6.3 and 0.7.x, includes lua functions)
+- [Psych Engine](https://github.com/ShadowMario/FNF-PsychEngine) (1.0.x, includes lua functions)
 - [Leather Engine](https://github.com/Leather128/LeatherEngine) (working 0.5.0)
 - [Kade Engine](https://github.com/KadeDev/Kade-Engine) (not tested)
 - [Yoshi Engine](https://github.com/YoshiCrafter29/YoshiCrafterEngine) (not tested)
@@ -32,7 +32,7 @@ Still very WIP and not everything is supported yet!
 - [Edwhak_KB](https://github.com/EdwhakKB) - Added some modifiers and fixed stuff + skewNotes
 - [Glowsoony](https://github.com/glowsoony) - Help with some 0.7.X stuff! + skewNotes too
 - [Slushi_Github](https://github.com/Slushi-Github) - Help with reorganisation with haxelib edition
-- [2JENO](https://github.com/2JENO) - Help with the Import.hx, GPU thing (fixes some things so thanks!)
+- [2JENO](https://github.com/2JENO) - Make Works On 1.0.x, Help with the Import.hx, GPU thing (fixes some things so thanks!)
 
 ## Installation 
 1. You need the most recent version of HaxeFlixel for it to work. (5.5.0 as of writing)
@@ -56,21 +56,17 @@ import modcharting.PlayfieldRenderer;
 ```haxe
 override public function create()
 {
-	//Add this before function create() (For Psych 0.7.1+)
 	var backupGpu:Bool;
-	//Add this before generateSong(); (For Psych 0.7.1+)
 	backupGpu = ClientPrefs.data.cacheOnGPU;
 	ClientPrefs.data.cacheOnGPU = false;
 	//Add this before camfollow stuff and after strumLineNotes and notes have been made
 	playfieldRenderer = new PlayfieldRenderer(strumLineNotes, notes, this);
 	playfieldRenderer.cameras = [camHUD];
-	add(playfieldRenderer);
-	add(grpNoteSplashes); /*place splashes in front (add this if the engine has splashes).
+	noteGroup.add(playfieldRenderer);
+	noteGroup.add(grpNoteSplashes); /*place splashes in front (add this if the engine has splashes).
 	If you have added this: remove(or something) the add(grpNoteSplashes); which is by default below the add(strumLineNotes);*/
-	//if you use PSYCH 0.6.3 use this code
-	ModchartFuncs.loadLuaFunctions(); //add this if you want lua functions in scripts
 	//being used in psych engine as an example
-callOnLuas('onCreatePost', []);
+	callOnLuas('onCreatePost', []);
       
   //Find this line and then add it
 public function startCountdown():Void
@@ -80,7 +76,7 @@ public function startCountdown():Void
   
   //add after generating strums
   NoteMovement.getDefaultStrumPos(this);
-//Find this line and then add it (For Psych 0.7.1+)
+
 override function destroy() {
 	ClientPrefs.data.cacheOnGPU = backupGpu;
 ```
@@ -117,7 +113,7 @@ ModchartFuncs.loadLuaFunctions(this); //add this if you want lua functions in sc
 callOnLuas('onCreate', []);
 ```
 
-- In FunkinLua.hx (Found in psychlua folder) (0.7.X exclusive!):
+- In FunkinLua.hx (Found in psychlua folder):
 ```haxe
 //at the start of the HX
     import modcharting.ModchartFuncs; //to fix any crash lmao
@@ -129,7 +125,7 @@ class FunkinLua
     ModchartFuncs.loadLuaFunctions(this); //add this if you want lua functions in scripts
     being used in psych engine as an example
 ```
-- In HScript (Found in psychlua folder) (0.7.X exclusive!)
+- In HScript (Found in psychlua folder) :
 ``` haxe
 //under the function (PRESET!)
 //copy and paste this code if you use under SScript 6.1.80
@@ -197,8 +193,7 @@ You need to define which engine you're using to fix compiling issues, or it woul
 Available ones: PSYCH, KADE(notTested), LEATHER, FOREVER_LEGACY(notTested), YOSHI(notTested), FPSPLUS(notTested)
 
 Note: If you use psych engine you should add this (have in mind "ver" is the version you want to use, do not add the text, use the brain)
-(just in case minimal ver is 0.6.0 to 0.7.3)
-and no if psych 0.7.4 or more releases i won't port this due some changes Psych has (they break MT to it max so srry :D)
+(just in case minimal ver is 1.0)
 
 ```xml
 
@@ -206,8 +201,6 @@ and no if psych 0.7.4 or more releases i won't port this due some changes Psych 
 
 ```
 
-to get 0.7.X and up add a higher version than 0.7 (example 0.7.3),
-leave it as another value to use 0.6.3 edition
-
+write "0.7.3" to get 1.0.X and up add a higher version than 1.0 (example 0.7.3),
 
 3. Now if your game compiles successfully then you should be all good to go.
